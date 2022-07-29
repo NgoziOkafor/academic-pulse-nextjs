@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int      @id @default(autoincrement())
+  email               String   @unique
+  firstname           String?
+  lastname            String?
+  password            String   @db.VarChar(255)
+  password_reset_code String?
+  session Session?
+  created_at          DateTime @default(now())
+}
+
+model University {
+  id        Int         @id @default(autoincrement())
+  name      String
+  country   String?
+  website   String?
+  slug      String?
+}
+
+model Favourite {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  universityId Int
+}
+
+model Country {
+  id        Int     @id @default(autoincrement())
+  name      String
+  shortName String?
+  code      String?
+}
+
+model Session {
+ id Int @id @default(autoincrement())
+ token String @unique
+ expiry_timestamp DateTime @default(dbgenerated("NOW() + interval '24 hours'"))
+ user User @relation(fields: [userId], references: [id])
+ userId Int
+
+}
